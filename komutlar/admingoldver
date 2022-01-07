@@ -1,0 +1,45 @@
+const db = require ('plantio.db')
+const disbut = require ('discord-buttons')
+const ms = require ('ms')
+exports.run = (client , message ,args)=>{
+if(message.author.id !== "929099324464451605")return;
+if(args[0] === "ver"){
+    if(!args[1])return message.channel.send('Lütfen id belirt ve gün belirt')
+    if(!args[2])return message.channel.send('lütfen gün belirt')
+    if(!client.users.cache.get(args[1]))return message.channel.send('yanlış kullanıcı')
+    let end = Date.now()+ms(args[2]);
+    db.set(args[1], { 
+        end: end,
+        start: Date.now(),
+        moderatorUsername: message.author.username,
+        reason: `${args[2].replace("d"," Günlük")} Gold Üyelik`
+        });
+    }else if(args[0] === "sil"){
+        if(!args[1])return message.channel.send('Lütfen id belirt ve gün belirt')
+        if(!db.fetch(args[1]))return message.channel.send('bu gold üye deil')
+        db.delete(args[1])
+        message.channel.send('başarılı')
+        const buton = new disbut.MessageButton()
+        .setEmoji("✔️")
+        .setStyle("url")
+        .setURL("https://discord.gg/studio")
+        .setLabel("Destek Sunucusu")
+        const buton2 = new disbut.MessageButton()
+        .setEmoji("✔️")
+        .setStyle("url")
+        .setURL("https://discord.com/oauth2/authorize?client_id=856469981901619220&scope=bot&permissions=805314622")
+        .setLabel("Botu Ekle!")
+        let buttonRow = new disbut.MessageActionRow()
+        .addComponent(buton)
+        .addComponent(buton2)
+        const dc = require ('discord.js')
+        const embed  = new dc.MessageEmbed()
+        .setTitle('Gold Üyelik')
+        .setDescription(`Merhaba Sayın Kullanıcımız **${client.users.cache.get(args[1]).username}**, \n Gold Üyeliğin Sahibim Tarafından Silinmiştir İtiraz Etmek İstersen Destek Sunucumuza Gelebilirsin`)
+        client.users.cache.get(args[1]).send()
+    }
+}
+exports.config = {
+    name:"admin-gold",
+    aliases:["admin-gold"]
+}
